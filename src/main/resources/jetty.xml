@@ -1,0 +1,86 @@
+<?xml version="1.0"?>
+<!DOCTYPE Configure PUBLIC "-//Mort Bay Consulting//DTD Configure//EN" "http://jetty.mortbay.org/configure.dtd">
+
+
+    <!-- =============================================================== -->
+    <!-- Configure the JVM JMX Server                                    -->
+    <!-- this configuration file should be used in combination with      -->
+    <!-- other configuration files.  e.g.                                -->
+    <!--    java -jar start.jar etc/jetty-jmx.xml etc/jetty.xml          -->
+    <!-- See jetty-jmx-mx4j.xml for a non JVM server solution            -->
+    <!-- =============================================================== -->
+<Configure id="Server" class="org.mortbay.jetty.Server">
+
+    <!-- =========================================================== -->
+    <!-- Initialize platform mbean server                            -->
+    <!-- =========================================================== -->
+    <!-- Create an MBeanServer or use the jdk 1.5 platformMBeanServer -->
+<!--
+    <Call id="MBeanServer" class="java.lang.management.ManagementFactory" name="getPlatformMBeanServer" />
+    <New id="JNDIMBeanServer" class="org.mortbay.jetty.plus.naming.Resource">
+        <Arg>jmx/runtime</Arg>
+        <Arg>
+            <Ref id="MBeanServer"></Ref>
+        </Arg>
+    </New>
+-->
+    <!--
+ -->
+    <!-- =========================================================== -->
+    <!-- Initialize mx4j mbean server                                -->
+    <!-- =========================================================== -->
+    <!-- replace platform config with
+    <Call id="MBeanServer" class="javax.management.MBeanServerFactory" name="createMBeanServer"/>
+    -->
+
+    <!-- initialize the Jetty MBean container -->
+    <!--
+        <Get id="Container" name="container"> <Call name="addEventListener"> <Arg> <New class="org.mortbay.management.MBeanContainer"> <Arg><Ref id="MBeanServer"/></Arg> <Set name="managementPort">8082</Set> <Call name="start" /> </New> </Arg> </Call> </Get>
+    -->
+    <!--
+        optionally add a remote JMX connector <Call id="jmxConnector" class="javax.management.remote.JMXConnectorServerFactory" name="newJMXConnectorServer"> <Arg> <New class="javax.management.remote.JMXServiceURL"> <Arg>service:jmx:rmi:///jndi/rmi:///jettymbeanserver</Arg> </New> </Arg> <Arg/> <Arg><Ref
+        id="MBeanServer"/></Arg> <Call name="start"/> </Call>
+    -->
+
+    <!-- http://commonj.myfoo.de/javadoc/de/myfoo/commonj/util/ThreadPool.html
+        minThreads - mininum number of threads
+        maxThreads - maximum number of threads
+        queueLength - length of the execution queue
+    -->
+
+    <!--
+    <New id="threadPool" class="de.myfoo.commonj.util.ThreadPool">
+        <Arg type="int">0</Arg>
+        <Arg type="int">10</Arg>
+        <Arg type="int">2</Arg>
+    </New>
+
+    <New id="workManager" class="de.myfoo.commonj.work.FooWorkManager">
+        <Arg>
+            <Ref id="threadPool"></Ref>
+        </Arg>
+    </New>
+
+    <New id="timerManager" class="de.myfoo.commonj.timers.FooTimerManager">
+        <Arg>
+            <Ref id="threadPool"></Ref>
+        </Arg>
+    </New>
+
+    <New id="printWorkManager" class="org.mortbay.jetty.plus.naming.Resource">
+        <Arg>wm/PrintWorkManager</Arg>
+        <Arg>
+            <Ref id="workManager"></Ref>
+        </Arg>
+    </New>
+
+    <New id="printQueueTimer" class="org.mortbay.jetty.plus.naming.Resource">
+        <Arg>timer/PrintQueueTimer</Arg>
+        <Arg>
+            <Ref id="timerManager"></Ref>
+        </Arg>
+    </New>
+    -->
+
+</Configure>
+

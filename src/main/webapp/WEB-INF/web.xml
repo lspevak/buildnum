@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns="http://java.sun.com/xml/ns/javaee" xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+	id="WebApp_ID" version="2.5">
+
+	<display-name>Build Number Generator</display-name>
+
+	<context-param>
+		<param-name>DB_DRIVER</param-name>
+		<param-value>org.hsqldb.jdbc.JDBCDriver</param-value>
+	</context-param>
+
+	<context-param>
+		<param-name>DB_URL</param-name>
+		<param-value>jdbc:hsqldb:hsql://localhost:4589/buildnum1</param-value>
+	</context-param>
+
+	<context-param>
+		<param-name>DB_USER</param-name>
+		<param-value>sa</param-value>
+	</context-param>
+
+	<context-param>
+		<param-name>DB_PASSWORD</param-name>
+		<param-value></param-value>
+	</context-param>
+
+	<context-param>
+		<param-name>DB_NAME</param-name>
+		<param-value>buildnum1</param-value>
+	</context-param>
+
+	<context-param>
+		<param-name>DB_PATH</param-name>
+		<param-value>/var/lib/buildnumdb/buildnum</param-value>
+	</context-param>
+
+	<context-param>
+		<param-name>DB_PORT</param-name>
+		<param-value>4589</param-value>
+	</context-param>
+
+	<welcome-file-list>
+		<welcome-file>index.jsp</welcome-file>
+	</welcome-file-list>
+
+	<servlet>
+		<servlet-name>VersionServlet</servlet-name>
+		<servlet-class>com.github.buildnum.servlet.VersionServlet</servlet-class>
+	</servlet>
+
+	<!-- groupId=...&artifactId=...&artifactVersion=...[&artifactClassifier=...&action=increment&versionOnly=1] -->
+	<servlet-mapping>
+		<servlet-name>VersionServlet</servlet-name>
+		<url-pattern>/service/version</url-pattern>
+	</servlet-mapping>
+
+	<session-config>
+		<session-timeout>1</session-timeout>
+	</session-config>
+
+	<listener>
+		<listener-class>com.github.buildnum.servlet.AppLifecycleListener</listener-class>
+	</listener>
+
+</web-app>
