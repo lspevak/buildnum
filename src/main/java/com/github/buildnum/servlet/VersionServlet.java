@@ -25,6 +25,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 
+import com.github.buildnum.ActionType;
+import com.github.buildnum.FormatType;
 import com.github.buildnum.VersionManager;
 import com.github.buildnum.VersionRequest;
 import com.github.buildnum.VersionResponse;
@@ -47,73 +49,61 @@ public class VersionServlet extends HttpServlet {
             throws ServletException, IOException {
 
         try {
-            final String action = req.getParameter("action");
-            final String ignoreSnapshotStr = req.getParameter("ignoreSnapshot");
-            final String prefix = req.getParameter("prefix");
-            // increment, get
-            final boolean increment = "increment".equals(action);
-            final boolean reset = "reset".equals(action);
-            final boolean ignoreSnapshot = "1".equals(ignoreSnapshotStr);
-            // return number only, not properties file content
-            final boolean versionOnly = "1".equals(req.getParameter("versionOnly"));
+            final String action = getParameter(req, "action");
+            final String format = getParameter(req, "format");
+            final String ignoreSnapshotStr = getParameter(req, "ignoreSnapshot");
 
             final VersionRequest versionRequest = new VersionRequest();
-            versionRequest.setGroupId(req.getParameter("groupId"));
-            versionRequest.setArtifactId(req.getParameter("artifactId"));
-            versionRequest.setArtifactClassifier(req
-                    .getParameter("artifactClassifier"));
-            versionRequest.setArtifactVersion(req
-                    .getParameter("artifactVersion"));
-            versionRequest.setIncrement(increment);
-            versionRequest.setReset(reset);
-            versionRequest.setIgnoreSnapshot(ignoreSnapshot);
+            versionRequest.setGroupId(getParameter(req, "groupId"));
+            versionRequest.setArtifactId(getParameter(req, "artifactId"));
+            versionRequest.setArtifactClassifier(getParameter(req, "artifactClassifier"));
+            versionRequest.setArtifactVersion(getParameter(req, "artifactVersion"));
+            versionRequest.setActionType(ActionType.fromValue(action));
+            versionRequest.setFormatType(FormatType.fromValue(format));
+            versionRequest.setIgnoreSnapshot("1".equals(ignoreSnapshotStr));
+            versionRequest.setBuildNumber(getParameterAsInt(req, "buildNumber")); // for SET action
+            versionRequest.setPrefix(getParameter(req, "prefix"));
 
             VersionResponse versionResponse = null;
 
             if (versionRequest.getGroupId() != null
-                    && versionRequest.getGroupId().trim().length() > 0
                     && versionRequest.getArtifactId() != null
-                    && versionRequest.getArtifactId().trim().length() > 0
-                    && versionRequest.getArtifactVersion() != null
-                    && versionRequest.getArtifactVersion().trim().length() > 0) {
-
-                if (versionRequest.getArtifactClassifier() != null
-                        && versionRequest.getArtifactClassifier().trim()
-                                .length() == 0) {
-                    versionRequest.setArtifactClassifier(null);
-                }
-
+                    && versionRequest.getArtifactVersion() != null) {
+                // call service
                 versionResponse = VersionManager.getInstance().getVersion(versionRequest);
             }
 
-            final StringBuilder b = new StringBuilder();
-
-            if (versionOnly) {
-                b.append(
-                        versionResponse == null ||
-                        versionResponse.getBuildVersion() == null ? "?" : "" + versionResponse.getBuildVersion());
-            } else {
-                if (versionResponse == null) {
-                    append(b, prefix, "status", "0");
-                } else {
-                    append(b, prefix, "status", "1");
-
-                    append(b, prefix, "groupId", versionResponse.getGroupId());
-                    append(b, prefix, "artifactId", versionResponse.getArtifactId());
-                    append(b, prefix, "artifactClassifier",
-                            versionResponse.getArtifactClassifier());
-                    append(b, prefix, "artifactVersion",
-                            versionResponse.getArtifactVersion());
-                    append(b, prefix, "buildNumber",
-                            versionResponse.getBuildVersion() + "");
-                }
-            }
-
-            writeOutput(b.toString(), resp);
+            final String output = getOutput(versionRequest, versionResponse);
+            // write to output stream
+            writeOutput(output, resp);
         } catch (Exception e) {
             log.error("Error in VersionServlet", e);
             throw new ServletException(e);
         }
+    }
+
+    protected static String getOutput(VersionRequest versionRequest, VersionResponse versionResponse) {
+        final StringBuilder b = new StringBuilder();
+
+        if (versionRequest.getFormatType() == FormatType.NUMBER) {
+            b.append(
+                    versionResponse == null ||
+                    versionResponse.getBuildNumber() == null ? "?" : "" + versionResponse.getBuildNumber());
+        } else {
+            if (versionResponse == null) {
+                append(b, versionRequest.getPrefix(), "status", "0");
+            } else {
+                append(b, versionRequest.getPrefix(), "status", "1");
+
+                append(b, versionRequest.getPrefix(), "groupId", versionResponse.getGroupId());
+                append(b, versionRequest.getPrefix(), "artifactId", versionResponse.getArtifactId());
+                append(b, versionRequest.getPrefix(), "artifactClassifier", versionResponse.getArtifactClassifier());
+                append(b, versionRequest.getPrefix(), "artifactVersion", versionResponse.getArtifactVersion());
+                append(b, versionRequest.getPrefix(), "buildNumber", versionResponse.getBuildNumber() + "");
+            }
+        }
+
+        return b.toString();
     }
 
     protected static void writeOutput(String s, HttpServletResponse resp)
@@ -134,6 +124,34 @@ public class VersionServlet extends HttpServlet {
         }
 
         b.append(LINE_END);
+    }
+
+    private String getParameter(HttpServletRequest req, String paramName) {
+        String paramValue = req.getParameter(paramName);
+        if (paramValue != null) {
+            paramValue = paramValue.trim();
+
+            if (paramValue.length() == 0) {
+                return null;
+            }
+        }
+
+        return paramValue;
+    }
+
+    private Integer getParameterAsInt(HttpServletRequest req, String paramName) {
+        String paramValue = getParameter(req, paramName);
+        if (paramValue != null) {
+            paramValue = paramValue.trim();
+
+            try {
+                return Integer.valueOf(paramValue);
+            } catch (Exception e) {
+                return null;
+            }
+        }
+
+        return null;
     }
 
 }

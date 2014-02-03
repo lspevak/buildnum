@@ -14,8 +14,6 @@
  */
 package com.github.buildnum;
 
-import java.io.PrintWriter;
-
 import org.hsqldb.Server;
 
 /**

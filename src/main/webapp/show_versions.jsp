@@ -37,7 +37,7 @@
                  <td><%= vr.getArtifactId()%></td>
                  <td><%= vr.getArtifactClassifier() == null ? "-" : vr.getArtifactClassifier() %></td>
                  <td><%= vr.getArtifactVersion()%></td>
-                 <td><%= vr.getBuildVersion()%></td>
+                 <td><%= vr.getBuildNumber()%></td>
                  <td><%= Utils.formatDate(vr.getCreatedAt())%></td>
                  <td><%= Utils.formatDate(vr.getUpdatedAt())%></td>
              </tr>

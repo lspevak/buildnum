@@ -25,10 +25,13 @@ public class VersionRequest {
     String artifactId;
     String artifactVersion;
     String artifactClassifier;
+    String prefix; // for properties output format
 
-    boolean increment;
     boolean ignoreSnapshot;
-    boolean reset;
+
+    ActionType actionType;
+    FormatType formatType;
+    Integer buildNumber;
 
     public String getGroupId() {
         return groupId;
@@ -62,14 +65,6 @@ public class VersionRequest {
         this.artifactClassifier = artifactClassifier;
     }
 
-    public boolean isIncrement() {
-        return increment;
-    }
-
-    public void setIncrement(boolean increment) {
-        this.increment = increment;
-    }
-
     public boolean isIgnoreSnapshot() {
         return ignoreSnapshot;
     }
@@ -78,12 +73,36 @@ public class VersionRequest {
         this.ignoreSnapshot = ignoreSnapshot;
     }
 
-    public boolean isReset() {
-        return reset;
+    public ActionType getActionType() {
+        return actionType;
     }
 
-    public void setReset(boolean reset) {
-        this.reset = reset;
+    public void setActionType(ActionType actionType) {
+        this.actionType = actionType;
+    }
+
+    public Integer getBuildNumber() {
+        return buildNumber;
+    }
+
+    public void setBuildNumber(Integer buildNumber) {
+        this.buildNumber = buildNumber;
+    }
+
+    public FormatType getFormatType() {
+        return formatType;
+    }
+
+    public void setFormatType(FormatType formatType) {
+        this.formatType = formatType;
+    }
+
+    public String getPrefix() {
+        return prefix;
+    }
+
+    public void setPrefix(String prefix) {
+        this.prefix = prefix;
     }
 
 }

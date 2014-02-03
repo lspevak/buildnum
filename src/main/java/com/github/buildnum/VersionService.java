@@ -37,17 +37,6 @@ public class VersionService implements IVersionService {
 
     private static final Logger log = Logger.getLogger(VersionManager.class);
 
-    // HSQL support
-    static final String SQL_INSERT = "INSERT INTO BUILD_VERSION (ID, GROUP_ID, ARTIFACT_ID, ARTIFACT_VERSION, ARTIFACT_CLASSIFIER, BUILD_VERSION, CREATED_AT, UPDATED_AT) "
-            + "VALUES (NEXT VALUE FOR SQ_BUILD_VERSION,?,?,?,?,?,CURRENT_TIMESTAMP,CURRENT_TIMESTAMP)";
-    static final String SQL_UPDATE = "UPDATE BUILD_VERSION SET BUILD_VERSION=BUILD_VERSION+1, UPDATED_AT=CURRENT_TIMESTAMP "
-            + "WHERE GROUP_ID=? AND ARTIFACT_ID=? AND ARTIFACT_VERSION=?";
-    static final String SQL_UPDATE_RESET = "UPDATE BUILD_VERSION SET BUILD_VERSION=1, UPDATED_AT=CURRENT_TIMESTAMP "
-            + "WHERE GROUP_ID=? AND ARTIFACT_ID=? AND ARTIFACT_VERSION=?";
-    static final String SQL_SELECT = "SELECT ID, GROUP_ID, ARTIFACT_ID, ARTIFACT_VERSION, ARTIFACT_CLASSIFIER, BUILD_VERSION, CREATED_AT, UPDATED_AT FROM BUILD_VERSION WHERE 1=1";
-    static final String SQL_CREATE_TABLE = "CREATE TABLE BUILD_VERSION (ID INTEGER NOT NULL, GROUP_ID VARCHAR(100) NOT NULL, ARTIFACT_ID VARCHAR(100) NOT NULL, ARTIFACT_VERSION VARCHAR(50) NOT NULL, ARTIFACT_CLASSIFIER VARCHAR(50), BUILD_VERSION INTEGER NOT NULL, CREATED_AT TIMESTAMP NOT NULL, UPDATED_AT TIMESTAMP NOT NULL, PRIMARY KEY(ID))";
-    static final String SQL_CREATE_SEQ = "CREATE SEQUENCE SQ_BUILD_VERSION";
-
     String dbUser;
     String dbPassword;
     String dbUrl;
@@ -121,7 +110,9 @@ public class VersionService implements IVersionService {
                 + versionRequest.getGroupId() + ", artifactId="
                 + versionRequest.getArtifactId() + ", version="
                 + versionRequest.getArtifactVersion() + ", classifier="
-                + versionRequest.getArtifactClassifier() + ")");
+                + versionRequest.getArtifactClassifier() + ", action="
+                + versionRequest.getActionType() +
+                ")");
 
         final String ver = versionRequest.getArtifactVersion();
         versionRequest.setArtifactVersion(versionRequest.isIgnoreSnapshot()
@@ -129,20 +120,42 @@ public class VersionService implements IVersionService {
                 ver.length() - 9) : ver);
 
         final List<VersionResponse> list = getVersionList(versionRequest);
+        final boolean exists = !list.isEmpty();
 
-        final VersionResponse versionResponse = new VersionResponse();
-        versionResponse.setGroupId(versionRequest.getGroupId());
-        versionResponse.setArtifactId(versionRequest.getArtifactId());
-        versionResponse.setArtifactClassifier(versionRequest
-                .getArtifactClassifier());
-        versionResponse.setArtifactVersion(versionRequest.getArtifactVersion());
-        versionResponse.setBuildVersion(Integer.valueOf(1));
+        VersionResponse versionResponse = null;
 
-        if (list.isEmpty()) {
-            updateVersion(versionResponse, true, false);
-        } else if ((versionRequest.isIncrement() || versionRequest.isReset())) {
-            updateVersion(versionResponse, false, versionRequest.isReset());
+        if (!exists) {
+            versionResponse = new VersionResponse();
+            versionResponse.setGroupId(versionRequest.getGroupId());
+            versionResponse.setArtifactId(versionRequest.getArtifactId());
+            versionResponse.setArtifactClassifier(versionRequest.getArtifactClassifier());
+            versionResponse.setArtifactVersion(versionRequest.getArtifactVersion());
+            versionResponse.setBuildNumber(1);
+        } else {
+            versionResponse = list.get(0);
         }
+
+        switch (versionRequest.getActionType()) {
+            case RESET:
+                versionResponse.setBuildNumber(1);
+                break;
+            case INCREMENT:
+                if (exists) {
+                    versionResponse.setBuildNumber(versionResponse.getBuildNumber() + 1);
+                }
+
+                break;
+            case SET:
+                if (versionRequest.getBuildNumber() != null && versionRequest.getBuildNumber() > 0) {
+                    versionResponse.setBuildNumber(versionRequest.getBuildNumber());
+                }
+
+                break;
+            default:
+                break;
+        }
+
+        updateVersion(versionResponse, !exists);
 
         final List<VersionResponse> list2 = getVersionList(versionRequest);
         if (list2.isEmpty()) {
@@ -150,11 +163,10 @@ public class VersionService implements IVersionService {
             return null;
         }
 
-        final VersionResponse versionResponse2 = list2.get(0);
-        log.info("Generated build number: "
-                + versionResponse2.getBuildVersion());
+        versionResponse = list2.get(0);
+        log.info("Generated build number: " + versionResponse.getBuildNumber());
 
-        return versionResponse2;
+        return versionResponse;
     }
 
     /* (non-Javadoc)
@@ -165,18 +177,18 @@ public class VersionService implements IVersionService {
         return getVersionList(null);
     }
 
-    private void updateVersion(VersionResponse v, boolean insert, boolean reset) {
+    private void updateVersion(VersionResponse v, boolean insert) {
         PreparedStatement s = null;
         Connection conn = null;
 
         try {
-            final StringBuilder b = new StringBuilder(
-                    insert ? SQL_INSERT
-                    : reset ?
-                            SQL_UPDATE_RESET :
-                            SQL_UPDATE);
+            final StringBuilder b = new StringBuilder();
 
-            if (!insert) {
+            if (insert) {
+                b.append(SQL_INSERT);
+            } else {
+                b.append(SQL_UPDATE_SET);
+
                 if (v.getArtifactClassifier() == null) {
                     b.append(" AND ARTIFACT_CLASSIFIER IS NULL");
                 } else {
@@ -200,8 +212,9 @@ public class VersionService implements IVersionService {
                     s.setNull(i++, Types.VARCHAR);
                 }
 
-                s.setInt(i++, v.getBuildVersion().intValue());
+                s.setInt(i++, v.getBuildNumber().intValue());
             } else {
+                s.setInt(i++, v.getBuildNumber());
                 s.setString(i++, v.getGroupId());
                 s.setString(i++, v.getArtifactId());
                 s.setString(i++, v.getArtifactVersion());
@@ -293,7 +306,7 @@ public class VersionService implements IVersionService {
                 v.setArtifactId(rs.getString(i++));
                 v.setArtifactVersion(rs.getString(i++));
                 v.setArtifactClassifier(rs.getString(i++));
-                v.setBuildVersion(Integer.valueOf(rs.getInt(i++)));
+                v.setBuildNumber(Integer.valueOf(rs.getInt(i++)));
                 v.setCreatedAt(rs.getTimestamp(i++));
                 v.setUpdatedAt(rs.getTimestamp(i++));
 

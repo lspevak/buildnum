@@ -22,17 +22,18 @@ import java.util.Date;
  * @author spevakl
  */
 public class VersionResponse extends VersionRequest {
+
     Long id;
-    Integer buildVersion;
+    Integer buildNumber;
     Date createdAt;
     Date updatedAt;
 
-    public Integer getBuildVersion() {
-        return buildVersion;
+    public Integer getBuildNumber() {
+        return buildNumber;
     }
 
-    public void setBuildVersion(Integer buildVersion) {
-        this.buildVersion = buildVersion;
+    public void setBuildNumber(Integer buildNumber) {
+        this.buildNumber = buildNumber;
     }
 
     public Date getCreatedAt() {

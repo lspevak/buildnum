@@ -50,7 +50,7 @@
 		<servlet-class>com.github.buildnum.servlet.VersionServlet</servlet-class>
 	</servlet>
 
-	<!-- groupId=...&artifactId=...&artifactVersion=...[&artifactClassifier=...&action=increment&versionOnly=1] -->
+	<!-- groupId=...&artifactId=...&artifactVersion=...[&artifactClassifier=...&action=increment|set|reset|show&format=num|props] -->
 	<servlet-mapping>
 		<servlet-name>VersionServlet</servlet-name>
 		<url-pattern>/service/version</url-pattern>
