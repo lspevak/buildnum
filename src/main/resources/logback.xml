@@ -1,0 +1,22 @@
+<configuration>
+
+    <!-- see PatternLayout -->
+    <property name="log_pattern" value="%date{ISO8601} | %-5level | %logger{15} | %msg | %xEx %n"/>
+
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <!-- target = System.out or System.err -->
+        <encoder type="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>${log_pattern}</pattern>
+        </encoder>
+    </appender>
+
+    <!-- Set the level for a given package TRACE, DEBUG, INFO, WARN, ERROR, ALL or OFF. -->
+    <logger name="com.github.buildnum" level="DEBUG"/>
+
+    <!-- Add appenders where the log data should be print out. -->
+    <root level="INFO">
+        <!-- For development purposes you can use the CONSOLE -->
+        <appender-ref ref="CONSOLE"/>
+    </root>
+
+</configuration>

@@ -1,12 +1,12 @@
 /**
  * Copyright 2014 Libor Spevak
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software distributed under
  * the License is distributed on an "AS IS" BASIS,  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
  * either express or implied.
@@ -23,13 +23,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.log4j.Logger;
 
 import com.github.buildnum.ActionType;
 import com.github.buildnum.FormatType;
 import com.github.buildnum.VersionManager;
 import com.github.buildnum.VersionRequest;
 import com.github.buildnum.VersionResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Artifact version request servlet.
@@ -42,7 +43,7 @@ public class VersionServlet extends HttpServlet {
 
     public static final String LINE_END = "\r\n";
 
-    protected static final Logger log = Logger.getLogger(VersionServlet.class);
+    protected static final Logger log = LoggerFactory.getLogger(VersionServlet.class);
 
     @Override
     protected void service(HttpServletRequest req, HttpServletResponse resp)
@@ -88,7 +89,7 @@ public class VersionServlet extends HttpServlet {
         if (versionRequest.getFormatType() == FormatType.NUMBER) {
             b.append(
                     versionResponse == null ||
-                    versionResponse.getBuildNumber() == null ? "?" : "" + versionResponse.getBuildNumber());
+                            versionResponse.getBuildNumber() == null ? "?" : "" + versionResponse.getBuildNumber());
         } else {
             if (versionResponse == null) {
                 append(b, versionRequest.getPrefix(), "status", "0");
@@ -113,7 +114,7 @@ public class VersionServlet extends HttpServlet {
     }
 
     protected static void append(StringBuilder b, String prefix, String key,
-            String value) {
+                                 String value) {
         if (prefix != null) {
             b.append(prefix).append(".");
         }

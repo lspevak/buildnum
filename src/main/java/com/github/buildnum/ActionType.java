@@ -29,7 +29,7 @@ public enum ActionType {
 
     String value;
 
-    private ActionType(String value) {
+    ActionType(String value) {
         this.value = value;
     }
 

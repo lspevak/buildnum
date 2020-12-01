@@ -1,12 +1,12 @@
 /**
  * Copyright 2014 Libor Spevak
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software distributed under
  * the License is distributed on an "AS IS" BASIS,  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
  * either express or implied.
@@ -18,9 +18,9 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
-import org.apache.log4j.Logger;
-
 import com.github.buildnum.VersionManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Lifecycle listener managed by JEE servlet container.
@@ -30,7 +30,7 @@ import com.github.buildnum.VersionManager;
  */
 public class AppLifecycleListener implements ServletContextListener {
 
-    private static final Logger log = Logger
+    private static final Logger log = LoggerFactory
             .getLogger(AppLifecycleListener.class);
 
     final VersionManager versionManager = VersionManager.getInstance();

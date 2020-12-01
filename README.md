@@ -1,6 +1,16 @@
 Simple JEE servlet application providing build numbers using HTTP REST method.
-The build numbers are managed inside HSQL database started automatically by the application.
+The build numbers are being managed inside HSQL database started automatically by the application.
 All parameters are set inside web.xml file.
+
+To compile:
+```
+mvn install
+```
+
+To run locally inside the Jetty container:
+```
+mvn jetty:run
+```
 
 To get next build number, simply call e.g.:
 

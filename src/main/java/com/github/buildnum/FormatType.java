@@ -26,7 +26,7 @@ public enum FormatType {
 
     String value;
 
-    private FormatType(String value) {
+    FormatType(String value) {
         this.value = value;
     }
 

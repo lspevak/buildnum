@@ -1,99 +1,122 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<groupId>com.github.buildnum</groupId>
-	<artifactId>buildnum</artifactId>
-	<version>1.0-SNAPSHOT</version>
-	<packaging>war</packaging>
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.github.buildnum</groupId>
+    <artifactId>buildnum</artifactId>
+    <version>1.1-SNAPSHOT</version>
+    <packaging>war</packaging>
 
-	<organization>
-		<name>Libor Spevak</name>
-	</organization>
+    <organization>
+        <name>Libor Spevak</name>
+    </organization>
 
-	<name>Build Number Generator Web Application</name>
+    <name>Build Number Generator Web Application</name>
 
-	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-	</properties>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-	<dependencies>
-		<dependency>
-			<groupId>org.hsqldb</groupId>
-			<artifactId>hsqldb</artifactId>
-			<version>2.3.1</version>
-		</dependency>
+        <!-- Logging -->
+        <slf4j.version>1.7.12</slf4j.version>
+        <logback.version>1.1.3</logback.version>
 
-		<dependency>
-			<groupId>commons-io</groupId>
-			<artifactId>commons-io</artifactId>
-			<version>2.1</version>
-		</dependency>
+        <!-- Database -->
+        <hsqldb.version>2.5.1</hsqldb.version>
 
-		<dependency>
-			<groupId>log4j</groupId>
-			<artifactId>log4j</artifactId>
-			<version>1.2.16</version>
-		</dependency>
+        <!-- Other -->
+        <commons-io.version>2.8.0</commons-io.version>
+        <maven-compile-plugin.version>3.3</maven-compile-plugin.version>
+    </properties>
 
-		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>javax.servlet-api</artifactId>
-			<version>3.0.1</version>
-			<scope>provided</scope>
-		</dependency>
 
-	</dependencies>
-	
-	<build>
-		<plugins>
-			<plugin>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<configuration>
-					<source>1.6</source>
-					<target>1.6</target>
-				</configuration>
-			</plugin>
-		</plugins>
-		<pluginManagement>
-			<plugins>
-				<plugin>
-					<groupId>org.mortbay.jetty</groupId>
-					<artifactId>maven-jetty-plugin</artifactId>
-					<version>6.1.26</version>
-					<configuration>
-						<connectors>
-							<connector implementation="org.mortbay.jetty.nio.SelectChannelConnector">
-								<port>8080</port>
-								<maxIdleTime>60000</maxIdleTime>
-							</connector>
-						</connectors>
-						<jettyConfig>src/main/resources/jetty.xml</jettyConfig>
-						<contextPath>/buildnum</contextPath>
-						<scanIntervalSeconds>5</scanIntervalSeconds>
-						<scanTargets>
-							<scanTarget>src/main/java</scanTarget>
-							<scanTarget>src/main/resources</scanTarget>
-							<scanTarget>src/main/webapp</scanTarget>
-						</scanTargets>
-						<integration>true</integration>
-					</configuration>
-					<executions>
-						<execution>
-							<id>start-jetty</id>
-							<phase>pre-integration-test</phase>
-							<goals>
-								<goal>run</goal>
-							</goals>
-							<configuration>
-								<scanIntervalSeconds>0</scanIntervalSeconds>
-								<daemon>true</daemon>
-							</configuration>
-						</execution>
-					</executions>
-				</plugin>
-			</plugins>
-		</pluginManagement>
+    <dependencies>
+        <dependency>
+            <groupId>org.hsqldb</groupId>
+            <artifactId>hsqldb</artifactId>
+            <version>${hsqldb.version}</version>
+        </dependency>
 
-	</build>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>${commons-io.version}</version>
+        </dependency>
 
+        <!-- Logging -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>${slf4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>${logback.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>jcl-over-slf4j</artifactId>
+            <version>${slf4j.version}</version>
+        </dependency>
+
+
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <version>3.0.1</version>
+            <scope>provided</scope>
+        </dependency>
+
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven-compile-plugin.version}</version>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                </configuration>
+            </plugin>
+        </plugins>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.mortbay.jetty</groupId>
+                    <artifactId>maven-jetty-plugin</artifactId>
+                    <version>6.1.26</version>
+                    <configuration>
+                        <connectors>
+                            <connector implementation="org.mortbay.jetty.nio.SelectChannelConnector">
+                                <port>8080</port>
+                                <maxIdleTime>60000</maxIdleTime>
+                            </connector>
+                        </connectors>
+                        <jettyConfig>src/main/resources/jetty.xml</jettyConfig>
+                        <contextPath>/buildnum</contextPath>
+                        <scanIntervalSeconds>5</scanIntervalSeconds>
+                        <scanTargets>
+                            <scanTarget>src/main/java</scanTarget>
+                            <scanTarget>src/main/resources</scanTarget>
+                            <scanTarget>src/main/webapp</scanTarget>
+                        </scanTargets>
+                        <integration>true</integration>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <id>start-jetty</id>
+                            <phase>pre-integration-test</phase>
+                            <goals>
+                                <goal>run</goal>
+                            </goals>
+                            <configuration>
+                                <scanIntervalSeconds>0</scanIntervalSeconds>
+                                <daemon>true</daemon>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
 </project>

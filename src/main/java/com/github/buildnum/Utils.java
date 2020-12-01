@@ -1,12 +1,12 @@
 /**
  * Copyright 2014 Libor Spevak
- *
+ * <p>
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- *
+ * <p>
  * http://www.apache.org/licenses/LICENSE-2.0
- *
+ * <p>
  * Unless required by applicable law or agreed to in writing, software distributed under
  * the License is distributed on an "AS IS" BASIS,  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
  * either express or implied.
@@ -21,7 +21,8 @@ import java.sql.ResultSet;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Utilities.
@@ -31,7 +32,7 @@ import org.apache.log4j.Logger;
  */
 public class Utils {
 
-    private static final Logger log = Logger.getLogger(Utils.class);
+    private static final Logger log = LoggerFactory.getLogger(Utils.class);
 
     private Utils() {
     }
@@ -45,7 +46,7 @@ public class Utils {
     }
 
     public static Connection getConnection(String dbUrl, String dbUser,
-            String dbPassword) {
+                                           String dbPassword) {
         try {
             final Connection conn = DriverManager.getConnection(dbUrl, dbUser,
                     dbPassword);
@@ -58,7 +59,7 @@ public class Utils {
     }
 
     public static Connection getConnectionWithTransaction(String dbUrl,
-            String dbUser, String dbPassword) {
+                                                          String dbUser, String dbPassword) {
         try {
             final Connection conn = DriverManager.getConnection(dbUrl, dbUser,
                     dbPassword);
@@ -96,7 +97,7 @@ public class Utils {
     }
 
     public static PreparedStatement getPreparedStatement(Connection conn,
-            String sql) {
+                                                         String sql) {
         try {
             final PreparedStatement s = conn.prepareStatement(sql);
             s.setQueryTimeout(60);
@@ -112,5 +113,4 @@ public class Utils {
         return f.format(d);
 
     }
-
 }
